@@ -1,0 +1,126 @@
+.job-details-card {
+  max-width: 3xl;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.job-details-card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.job-details-backlink {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+.job-details-backlink:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.job-details-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.job-details-company,
+.job-details-location {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.job-details-type {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  text-transform: capitalize;
+}
+.job-details-type.intern {
+  background-color: #bfdbfe; 
+  color: #1d4ed8;
+}
+.job-details-type.full-time {
+  background-color: #bbf7d0;
+  color: #15803d;
+}
+
+.job-details-salary {
+  font-size: 1rem;
+  color: #374151;
+  margin: 0.5rem 0 1rem;
+}
+
+.job-details-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.job-details-tag {
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.job-details-description {
+  font-size: 1rem;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.job-details-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.job-details-edit-btn,
+.job-details-delete-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #ffffff;
+}
+
+.job-details-edit-btn {
+  background-color: #3b82f6;
+}
+.job-details-edit-btn:hover {
+  background-color: #2563eb;
+}
+
+.job-details-delete-btn {
+  background-color: #ef4444;
+}
+.job-details-delete-btn:hover {
+  background-color: #b91c1c;
+}
+
+.job-details-loading,
+.job-details-error,
+.job-details-notfound {
+  text-align: center;
+  padding: 4rem 1rem;
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.job-details-error {
+  color: #ef4444;
+}
