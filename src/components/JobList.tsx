@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useJobsStore } from '../store/useJobsStore';
 import { Link, useSearchParams } from 'react-router-dom';
 import debounce from 'lodash/debounce';
@@ -29,10 +29,16 @@ export default function JobList() {
     setSearchParams(params);
   }, [search, typeFilter, locationFilter, tagsFilter, sortBy, setSearchParams]);
 
-  const debouncedSetSearch = useCallback(
-    debounce((val: string) => setSearch(val), 300),
+  const debouncedSetSearch = useMemo(
+    () => debounce((val: string) => setSearch(val), 300),
     []
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearch.cancel();
+    };
+  }, [debouncedSetSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -66,12 +72,7 @@ export default function JobList() {
     <div className="job-list-container">
       <div className="job-list-header">
         <h1 className="job-list-title">Список вакансий</h1>
-        <Link
-          to="/jobs/new"
-          className="job-create-btn"
-        >
-          + Создать вакансию
-        </Link>
+        <Link to="/jobs/new" className="job-create-btn">+ Создать вакансию</Link>
       </div>
 
       <div className="job-filters">

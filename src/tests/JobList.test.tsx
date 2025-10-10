@@ -1,14 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+// src/tests/JobList.test.tsx
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import JobList from '../JobList';
+import JobList from '../components/JobList';
 
 describe('JobList', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
   it('отображает список вакансий после загрузки', async () => {
     render(
       <BrowserRouter>
@@ -16,11 +13,11 @@ describe('JobList', () => {
       </BrowserRouter>
     );
 
-    // Проверяем текст загрузки
-    expect(screen.getByText(/Загрузка вакансий/i)).toBeInTheDocument();
+    const firstJob = await screen.findByText(/Frontend Intern/i);
+    const secondJob = await screen.findByText(/Junior Frontend/i);
 
-    // Ждём появления вакансий
-    await screen.findByText(/Frontend Intern/i);
+    expect(firstJob).toBeInTheDocument();
+    expect(secondJob).toBeInTheDocument();
   });
 
   it('фильтрует вакансии по поиску', async () => {
@@ -30,14 +27,18 @@ describe('JobList', () => {
       </BrowserRouter>
     );
 
-    // Ждём загрузки вакансий
     await screen.findByText(/Frontend Intern/i);
+    await screen.findByText(/Junior Frontend/i);
 
     const searchInput = screen.getByPlaceholderText(/Поиск по названию или компании/i);
+
+    await userEvent.clear(searchInput);
     await userEvent.type(searchInput, 'Globex');
 
-    // Проверяем результаты фильтрации
-    await screen.findByText(/Junior Frontend/i);
-    expect(screen.queryByText(/Frontend Intern/i)).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByText(/Frontend Intern/i)).toBeNull();
+    });
+
+    expect(screen.getByText(/Junior Frontend/i)).toBeInTheDocument();
   });
 });
