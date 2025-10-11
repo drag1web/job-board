@@ -1,0 +1,215 @@
+:root {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-text: #111827;
+  --color-text-secondary: #374151;
+  --color-error: #ef4444;
+  --color-tag-bg: #f3f4f6;
+  --color-tag-text: #374151;
+  --color-bg: #ffffff;         /* фон страницы */
+  --color-card-bg: #cacaca;    /* фон формы / карточки */
+  --transition-fast: 0.2s;
+  --transition-smooth: 0.4s;
+  --radius-card: 1rem;
+  --radius-tag: 0.5rem;
+  --input-border: #d1d5db;
+  --input-shadow: rgba(0,0,0,0.08);
+}
+
+.dark {
+  --color-bg: #1f2937;
+  --color-text: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-card-bg: #111827;
+  --color-tag-bg: #374151;
+  --color-tag-text: #f3f4f6;
+  --input-border: #374151;
+  --input-shadow: rgba(0,0,0,0.3);
+}
+
+/* === Job Form Card Container === */
+.job-form-card {
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 18px var(--input-shadow);
+  transition: all var(--transition-fast) ease-in-out;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp var(--transition-smooth) forwards;
+}
+.job-form-card:hover {
+  box-shadow: 0 8px 24px var(--input-shadow);
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Form Title === */
+.job-form-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--color-text);
+  text-align: center;
+  position: relative;
+}
+.job-form-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--color-primary);
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+/* === Form Fields === */
+.job-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.job-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-form-label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--color-text-secondary);
+}
+
+.job-form-input,
+.job-form-textarea,
+.job-form-select {
+  border: 1px solid var(--input-border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  transition: all var(--transition-fast) ease-in-out;
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  box-shadow: 0 2px 6px var(--input-shadow);
+}
+
+.job-form-input::placeholder,
+.job-form-textarea::placeholder {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.job-form-input:focus,
+.job-form-textarea:focus,
+.job-form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+
+/* === Errors === */
+.job-form-error {
+  font-size: 0.875rem;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+}
+
+/* === Row === */
+.job-form-row {
+  display: flex;
+  gap: 1rem;
+}
+.job-form-row .job-form-field { flex: 1; }
+
+/* === Tags Preview === */
+.job-form-tags,
+.tags-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.tags-preview .job-tag {
+  background-color: var(--color-tag-bg);
+  color: var(--color-tag-text);
+  padding: 2px 6px;
+  border-radius: var(--radius-tag);
+  font-size: 0.75rem;
+}
+
+/* === Buttons === */
+.job-form-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--color-primary);
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast) ease-in-out;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px var(--input-shadow);
+}
+.job-form-button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--input-shadow);
+}
+.job-form-button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.job-form-back-btn {
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  transition: all var(--transition-fast);
+}
+.job-form-back-btn:hover {
+  background-color: var(--color-tag-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px var(--input-shadow);
+}
+
+/* === Type Preview === */
+.job-type-preview {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-tag);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 4px 0;
+  text-transform: uppercase;
+}
+.job-type-preview.intern {
+  background-color: #d0ebff;
+  color: #1c7ed6;
+}
+.job-type-preview.full-time {
+  background-color: #bbf7d0;
+  color: #15803d;
+}
+
+/* === Salary Preview === */
+.salary-preview {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .job-form-row { flex-direction: column; }
+}

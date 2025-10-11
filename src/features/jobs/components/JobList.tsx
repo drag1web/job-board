@@ -1,11 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
-import { useJobsStore } from "../store/useJobsStore";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { useJobsStore } from "../../../store/useJobsStore";
 import { Link, useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import "./JobList.css";
 
 export default function JobList() {
-  const { jobs, loading, error, fetchJobs } = useJobsStore();
+  const { jobs, error, fetchJobs } = useJobsStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [search, setSearch] = useState(searchParams.get("q") || "");
@@ -16,15 +16,24 @@ export default function JobList() {
   );
   const [tagsFilter, setTagsFilter] = useState(searchParams.get("tags") || "");
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "date");
-
-  // 🔹 Новое состояние для пагинации
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get("page")) || 1
   );
-  const jobsPerPage = 8; // сколько карточек на странице
+  const jobsPerPage = 8;
+
+  const [loading, setLoading] = useState(true);
+
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchJobs();
+    async function loadJobs() {
+      setLoading(true);
+      await new Promise((res) => setTimeout(res, 500 + Math.random() * 300));
+      await fetchJobs();
+      setLoading(false);
+    }
+    loadJobs();
   }, [fetchJobs]);
 
   useEffect(() => {
@@ -51,16 +60,12 @@ export default function JobList() {
     []
   );
 
-  useEffect(() => {
-    return () => {
-      debouncedSetSearch.cancel();
-    };
-  }, [debouncedSetSearch]);
+  useEffect(() => () => debouncedSetSearch.cancel(), [debouncedSetSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
     debouncedSetSearch(e.target.value);
-    setCurrentPage(1); // сброс на первую страницу при поиске
+    setCurrentPage(1);
   };
 
   const filteredJobs = useMemo(() => {
@@ -93,7 +98,6 @@ export default function JobList() {
       });
   }, [jobs, search, typeFilter, locationFilter, tagsFilter, sortBy]);
 
-  // 🔹 Пагинация
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
   const startIndex = (currentPage - 1) * jobsPerPage;
   const paginatedJobs = filteredJobs.slice(
@@ -116,13 +120,41 @@ export default function JobList() {
     setCurrentPage(1);
   };
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (paginatedJobs.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex((prev) =>
+        prev === null ? 0 : Math.min(prev + 1, paginatedJobs.length - 1)
+      );
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex((prev) =>
+        prev === null ? 0 : Math.max(prev - 1, 0)
+      );
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      if (focusedIndex !== null) {
+        const link = listRef.current?.querySelectorAll<HTMLAnchorElement>(
+          ".job-card"
+        )[focusedIndex];
+        link?.click();
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [focusedIndex, paginatedJobs]);
+
   if (loading) {
     return (
       <div className="job-list-container">
-        <div className="skeleton-card" />
-        <div className="skeleton-card" />
-        <div className="skeleton-card" />
-        <div className="skeleton-card" />
+        {Array.from({ length: jobsPerPage }).map((_, i) => (
+          <div key={i} className="skeleton-card" />
+        ))}
       </div>
     );
   }
@@ -131,7 +163,7 @@ export default function JobList() {
     return <div className="job-list-error">Ой! Что-то пошло не так.</div>;
 
   return (
-    <div className="job-list-container">
+    <div className="job-list-container" ref={listRef}>
       <div className="job-list-header">
         <h1 className="job-list-title">
           Список вакансий ({filteredJobs.length})
@@ -196,8 +228,14 @@ export default function JobList() {
         {filteredJobs.length === 0 ? (
           <div className="no-jobs">Вакансий не найдено.</div>
         ) : (
-          paginatedJobs.map((job) => (
-            <Link to={`/jobs/${job.id}`} key={job.id} className="job-card">
+          paginatedJobs.map((job, index) => (
+            <Link
+              to={`/jobs/${job.id}`}
+              key={job.id}
+              className={`job-card ${focusedIndex === index ? "focused" : ""}`}
+              tabIndex={0}
+              onFocus={() => setFocusedIndex(index)}
+            >
               <div className="job-header">
                 <h2>{job.title}</h2>
                 <span className={`job-type ${job.type}`}>{job.type}</span>
@@ -218,6 +256,7 @@ export default function JobList() {
           ))
         )}
       </div>
+
       {totalPages > 1 && (
         <div className="pagination">
           <button

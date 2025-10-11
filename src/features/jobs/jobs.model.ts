@@ -12,6 +12,8 @@ export interface Job {
   currency: string;
   tags: string[];
   description: string;
+  experience?: string;
+  education?: string;
 }
 
 import { z } from 'zod';
@@ -31,7 +33,8 @@ export const JobSchema = z.object({
   currency: z.string().length(3),
   tags: z.array(z.string()),
   description: z.string().min(5),
+  experience: z.string().optional(),
+  education: z.string().optional(),
 });
 
 export type JobFormValues = z.infer<typeof JobSchema>;
-

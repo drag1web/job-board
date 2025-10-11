@@ -1,9 +1,8 @@
-// src/tests/JobList.test.tsx
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import JobList from '../components/JobList';
+import JobList from '../../features/jobs/components/JobList';
 
 describe('JobList', () => {
   it('отображает список вакансий после загрузки', async () => {
