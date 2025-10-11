@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Job } from '../models/Job';
-import { JobSchema } from '../models/Job';
+import type { Job } from './jobs.model';
+import { JobSchema } from './jobs.model';
 
 const LOCAL_STORAGE_KEY = 'jobs_data';
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -78,8 +78,6 @@ export const useJobsStore = create<JobsState>((set, get) => ({
   jobs: [],
   loading: false,
   error: null,
-
-  // Загрузка
   fetchJobs: async () => {
     set({ loading: true, error: null });
     try {
@@ -92,20 +90,14 @@ export const useJobsStore = create<JobsState>((set, get) => ({
       set({ loading: false });
     }
   },
-
-  // ✅ Оптимистичное добавление
   addJob: async (job: Job) => {
     const optimisticJob = { ...JobSchema.parse(job), id: Date.now().toString() };
     const prevJobs = get().jobs;
-
-    // мгновенно добавляем
     set({ jobs: [optimisticJob, ...prevJobs] });
     saveJobs([optimisticJob, ...prevJobs]);
 
     try {
       await sleep(300 + Math.random() * 200);
-
-      // случайная ошибка 10% (для теста)
       if (Math.random() < 0.1) throw new Error('Random fail');
 
       const validated = JobSchema.parse(optimisticJob);
@@ -113,18 +105,14 @@ export const useJobsStore = create<JobsState>((set, get) => ({
       saveJobs(jobs);
       set({ jobs });
     } catch {
-      // ❌ откат при ошибке
       set({ jobs: prevJobs, error: 'Ошибка при создании вакансии' });
       saveJobs(prevJobs);
     }
   },
 
-  // ✅ Оптимистичное обновление
   updateJob: async (job: Job) => {
     const prevJobs = get().jobs;
     const updated = JobSchema.parse(job);
-
-    // сразу обновляем
     set({
       jobs: prevJobs.map(j => (j.id === job.id ? updated : j)),
     });
@@ -134,17 +122,12 @@ export const useJobsStore = create<JobsState>((set, get) => ({
       await sleep(300 + Math.random() * 200);
       if (Math.random() < 0.1) throw new Error('Random fail');
     } catch {
-      // ❌ откат
       set({ jobs: prevJobs, error: 'Ошибка при обновлении вакансии' });
       saveJobs(prevJobs);
     }
   },
-
-  // ✅ Оптимистичное удаление
   deleteJob: async (id: string) => {
     const prevJobs = get().jobs;
-
-    // сразу удаляем
     const updatedJobs = prevJobs.filter(j => j.id !== id);
     set({ jobs: updatedJobs });
     saveJobs(updatedJobs);
@@ -153,7 +136,6 @@ export const useJobsStore = create<JobsState>((set, get) => ({
       await sleep(300 + Math.random() * 200);
       if (Math.random() < 0.1) throw new Error('Random fail');
     } catch {
-      // ❌ откат
       set({ jobs: prevJobs, error: 'Ошибка при удалении вакансии' });
       saveJobs(prevJobs);
     }

@@ -16,14 +16,10 @@ export default function JobDetails() {
   useEffect(() => {
     async function loadJob() {
       setLoading(true);
-
-      // Имитация псевдозадержки 300–800 мс
       const delay = 300 + Math.random() * 500;
       await new Promise((resolve) => setTimeout(resolve, delay));
 
-      if (jobs.length === 0) {
-        await fetchJobs();
-      }
+      if (jobs.length === 0) await fetchJobs();
 
       const found = useJobsStore.getState().jobs.find((j) => j.id === id) || null;
       setJob(found);
@@ -32,12 +28,9 @@ export default function JobDetails() {
     loadJob();
   }, [jobs, fetchJobs, id]);
 
-  // Escape → главная
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        navigate("/");
-      }
+      if (e.key === "Escape") navigate("/");
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
@@ -63,7 +56,6 @@ export default function JobDetails() {
     alert("Ссылка на вакансию скопирована!");
   };
 
-  // Loader / error / not found
   if (loading || jobsLoading) return <div className="job-details-loading">Загрузка вакансии...</div>;
   if (error) return <div className="job-details-error">{error}</div>;
   if (!job)
@@ -95,8 +87,11 @@ export default function JobDetails() {
       </div>
 
       <div className="job-details-company-info">
-        <p className="job-details-company">{job.company}</p>
+        <p className="job-details-company">💼 {job.company}</p>
         <p className="job-details-location">📍 {job.location}</p>
+        <p className="job-details-posted">
+          🗓 Опубликовано: {new Date(job.postedAt).toLocaleDateString()}
+        </p>
       </div>
 
       <div className="job-details-extra">
@@ -107,8 +102,8 @@ export default function JobDetails() {
 
       {job.tags?.length > 0 && (
         <div className="job-details-tags">
-          {job.tags.map((tag) => (
-            <span key={tag} className="job-details-tag">
+          {job.tags.map((tag, index) => (
+            <span key={`${tag}-${index}`} className="job-details-tag">
               {tag}
             </span>
           ))}

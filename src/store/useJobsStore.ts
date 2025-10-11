@@ -81,7 +81,7 @@ export const useJobsStore = create<JobsState>((set, get) => ({
   fetchJobs: async () => {
     set({ loading: true, error: null });
     try {
-      await sleep(100); // маленькая задержка для тестов
+      await sleep(100); 
       const jobs = loadJobs();
       set({ jobs });
     } catch {
@@ -94,7 +94,6 @@ export const useJobsStore = create<JobsState>((set, get) => ({
   addJob: async (job: Job) => {
     const prevJobs = get().jobs;
 
-    // Если id уже есть (например, в тесте), оставляем его
     const optimisticJob = JobSchema.parse({
       ...job,
       id: job.id ?? Date.now().toString(),
@@ -104,9 +103,8 @@ export const useJobsStore = create<JobsState>((set, get) => ({
     saveJobs([optimisticJob, ...prevJobs]);
 
     try {
-      await sleep(100); // для тестов минимальная задержка
+      await sleep(100); 
 
-      // Здесь отключаем случайные ошибки, чтобы тесты были стабильными
       const jobs = [optimisticJob, ...prevJobs];
       saveJobs(jobs);
       set({ jobs });

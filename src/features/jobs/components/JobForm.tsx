@@ -61,19 +61,14 @@ export default function JobForm() {
         },
   });
 
+  // Escape → главная
   useEffect(() => {
-  const handleEscape = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      navigate("/"); // возвращаемся на главную
-    }
-  };
-
-  window.addEventListener("keydown", handleEscape);
-  return () => {
-    window.removeEventListener("keydown", handleEscape);
-  };
-}, [navigate]);
-
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") navigate("/");
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [navigate]);
 
   useEffect(() => {
     if (jobToEdit) {
@@ -90,12 +85,8 @@ export default function JobForm() {
     const jobData: Job = {
       ...data,
       id: jobToEdit?.id || uuidv4(),
-      tags:
-        data.tags
-          ?.split(",")
-          .map((t) => t.trim())
-          .filter(Boolean) || [],
-      postedAt: new Date(data.postedAt).toISOString(),
+      tags: data.tags?.split(",").map((t) => t.trim()).filter(Boolean) || [],
+      postedAt: jobToEdit ? data.postedAt : new Date().toISOString(),
     };
 
     if (jobToEdit) {
@@ -132,25 +123,19 @@ export default function JobForm() {
         <div className="job-form-field">
           <label className="job-form-label">Заголовок</label>
           <input {...register("title")} className="job-form-input" />
-          {errors.title && (
-            <p className="job-form-error">{errors.title.message}</p>
-          )}
+          {errors.title && <p className="job-form-error">{errors.title.message}</p>}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Компания</label>
           <input {...register("company")} className="job-form-input" />
-          {errors.company && (
-            <p className="job-form-error">{errors.company.message}</p>
-          )}
+          {errors.company && <p className="job-form-error">{errors.company.message}</p>}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Локация</label>
           <input {...register("location")} className="job-form-input" />
-          {errors.location && (
-            <p className="job-form-error">{errors.location.message}</p>
-          )}
+          {errors.location && <p className="job-form-error">{errors.location.message}</p>}
         </div>
 
         <div className="job-form-field">
@@ -162,9 +147,7 @@ export default function JobForm() {
           <span className={`job-type-preview ${typeValue}`}>
             {typeValue === "intern" ? "Intern" : "Full-time"}
           </span>
-          {errors.type && (
-            <p className="job-form-error">{errors.type.message}</p>
-          )}
+          {errors.type && <p className="job-form-error">{errors.type.message}</p>}
         </div>
 
         <div className="job-form-row">
@@ -192,9 +175,7 @@ export default function JobForm() {
         <div className="job-form-field">
           <label className="job-form-label">Валюта</label>
           <input {...register("currency")} className="job-form-input" />
-          {errors.currency && (
-            <p className="job-form-error">{errors.currency.message}</p>
-          )}
+          {errors.currency && <p className="job-form-error">{errors.currency.message}</p>}
         </div>
 
         <div className="job-form-field">
@@ -222,13 +203,11 @@ export default function JobForm() {
         <div className="job-form-field">
           <label className="job-form-label">Дата публикации</label>
           <input
-            type="date"
-            {...register("postedAt")}
+            type="text"
+            value={jobToEdit ? jobToEdit.postedAt.split("T")[0] : new Date().toLocaleDateString()}
+            readOnly
             className="job-form-input"
           />
-          {errors.postedAt && (
-            <p className="job-form-error">{errors.postedAt.message}</p>
-          )}
         </div>
 
         <div className="job-form-field">
@@ -237,10 +216,8 @@ export default function JobForm() {
             {...register("description")}
             className="job-form-textarea"
             rows={5}
-          ></textarea>
-          {errors.description && (
-            <p className="job-form-error">{errors.description.message}</p>
-          )}
+          />
+          {errors.description && <p className="job-form-error">{errors.description.message}</p>}
         </div>
 
         <button

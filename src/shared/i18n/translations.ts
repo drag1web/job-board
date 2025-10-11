@@ -32,8 +32,6 @@ export const translations = {
     postedAt: "Дата публикации",
     description: "Описание",
     save: "Сохранить",
-
-    // Для JobList
     jobList: "Список вакансий",
     searchPlaceholder: "Поиск по названию или компании",
     allTypes: "Все типы",
@@ -77,8 +75,6 @@ export const translations = {
     postedAt: "Posted at",
     description: "Description",
     save: "Save",
-
-    // Для JobList
     jobList: "Job List",
     searchPlaceholder: "Search by title or company",
     allTypes: "All types",

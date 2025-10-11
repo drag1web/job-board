@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback  } from "react";
 import { useJobsStore } from "../../../store/useJobsStore";
 import { Link, useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
@@ -22,7 +22,6 @@ export default function JobList() {
   const jobsPerPage = 8;
 
   const [loading, setLoading] = useState(true);
-
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +58,6 @@ export default function JobList() {
     () => debounce((val: string) => setSearch(val), 300),
     []
   );
-
   useEffect(() => () => debouncedSetSearch.cancel(), [debouncedSetSearch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,9 +81,12 @@ export default function JobList() {
       )
       .filter((job) => {
         if (!tagsFilter) return true;
-        const tags = tagsFilter.split(",").map((t) => t.trim().toLowerCase());
-        return tags.every((tag) =>
-          job.tags.map((t) => t.toLowerCase()).includes(tag)
+        const tags = tagsFilter
+          .split(",")
+          .map((t) => t.trim().toLowerCase())
+          .filter(Boolean);
+        return tags.every((filterTag) =>
+          job.tags.some((t) => t.toLowerCase().includes(filterTag))
         );
       })
       .sort((a, b) => {
@@ -120,40 +121,42 @@ export default function JobList() {
     setCurrentPage(1);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (paginatedJobs.length === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setFocusedIndex((prev) =>
-        prev === null ? 0 : Math.min(prev + 1, paginatedJobs.length - 1)
-      );
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setFocusedIndex((prev) =>
-        prev === null ? 0 : Math.max(prev - 1, 0)
-      );
-    }
-    if (e.key === "Enter" || e.key === " ") {
-      if (focusedIndex !== null) {
-        const link = listRef.current?.querySelectorAll<HTMLAnchorElement>(
-          ".job-card"
-        )[focusedIndex];
-        link?.click();
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (paginatedJobs.length === 0) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setFocusedIndex((prev) =>
+          prev === null ? 0 : Math.min(prev + 1, paginatedJobs.length - 1)
+        );
       }
-    }
-  };
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev === null ? 0 : Math.max(prev - 1, 0)));
+      }
+      if (e.key === "Enter" || e.key === " ") {
+        if (focusedIndex !== null) {
+          const link =
+            listRef.current?.querySelectorAll<HTMLAnchorElement>(".job-card")[
+              focusedIndex
+            ];
+          link?.click();
+        }
+      }
+    },
+    [focusedIndex, paginatedJobs]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [focusedIndex, paginatedJobs]);
+  }, [handleKeyDown]);
 
   if (loading) {
     return (
       <div className="job-list-container">
         {Array.from({ length: jobsPerPage }).map((_, i) => (
-          <div key={i} className="skeleton-card" />
+          <div key={`skeleton-${i}`} className="skeleton-card" />
         ))}
       </div>
     );
@@ -231,7 +234,7 @@ export default function JobList() {
           paginatedJobs.map((job, index) => (
             <Link
               to={`/jobs/${job.id}`}
-              key={job.id}
+              key={`${job.id}-${index}`}
               className={`job-card ${focusedIndex === index ? "focused" : ""}`}
               tabIndex={0}
               onFocus={() => setFocusedIndex(index)}
@@ -246,8 +249,8 @@ export default function JobList() {
                 💰 {job.salaryFrom} – {job.salaryTo} {job.currency}
               </p>
               <div className="job-tags">
-                {job.tags.map((tag) => (
-                  <span key={tag} className="job-tag">
+                {job.tags.map((tag, i) => (
+                  <span key={`${tag}-${i}`} className="job-tag">
                     {tag}
                   </span>
                 ))}

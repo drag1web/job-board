@@ -3,7 +3,8 @@
   --color-primary-hover: #059669;
   --color-text: #111827;
   --color-text-secondary: #555;
-  --color-bg: #f3f4f6;           
+  --color-bg: #f3f4f6;
+  --color-card-bg: #fff;
   --color-tag-bg: #f3f4f6;
   --color-tag-text: #374151;
   --card-shadow: rgba(0,0,0,0.08);
@@ -25,13 +26,14 @@
   --card-shadow: rgba(0,0,0,0.3);
 }
 
-.job-list-container {
+.job-list-container,
+.job-list-wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 2rem;
   font-family: 'Inter', Arial, sans-serif;
   color: var(--color-text);
   background-color: var(--color-bg);
-  max-width: 1280px;
-  margin: 0 auto;
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
 
@@ -39,23 +41,32 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
+  margin-bottom: 1.5rem;
 }
+
 .job-list-title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-text);
 }
+
+.job-create-btn,
+.reset-filters-btn,
+.job-filters button,
+.pagination-btn {
+  border-radius: var(--radius-card);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
 .job-create-btn {
+  padding: 0.6rem 1.2rem;
   background-color: var(--color-primary);
   color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-card);
-  font-weight: 600;
   text-decoration: none;
-  transition: all var(--transition-fast);
   box-shadow: 0 4px 12px var(--card-shadow);
 }
 .job-create-btn:hover {
@@ -67,39 +78,35 @@
 .job-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 2rem;
 }
+
 .job-filters input,
-.job-filters select {
+.job-filters select,
+.reset-filters-btn {
   padding: 0.5rem 0.75rem;
-  font-size: 0.95rem;
-  border-radius: var(--radius-card);
   border: 1px solid #d1d5db;
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
   flex: 1 1 140px;
   min-width: 100px;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
-  background-color: var(--color-card-bg);
-  color: var(--color-text);
 }
+
 .job-filters input:focus,
 .job-filters select:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
   outline: none;
 }
-.job-filters button {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-card);
-  border: none;
+
+.reset-filters-btn {
   background-color: var(--color-tag-bg);
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.95rem;
-  transition: all var(--transition-fast);
-  color: var(--color-text);
+  color: var(--color-text-secondary);
+  border: 1px solid #d1d5db;
 }
-.job-filters button:hover {
+.reset-filters-btn:hover {
   background-color: var(--color-primary);
   color: #fff;
   transform: translateY(-1px);
@@ -113,13 +120,15 @@
 }
 
 .job-card {
-  display: block;
-  background: var(--color-card-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--color-card-bg);
   padding: 1.2rem 1rem;
   border-radius: var(--radius-card);
-  text-decoration: none;
   color: var(--color-text);
-  box-shadow: 0 6px 20px var(--card-shadow);
+  text-decoration: none;
+  box-shadow: 0 3px 6px var(--card-shadow);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
   border-bottom: 3px solid var(--color-primary);
   opacity: 0;
@@ -127,16 +136,19 @@
   animation: fadeInUp var(--transition-smooth) forwards;
 }
 .job-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px var(--card-shadow);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px var(--card-shadow);
   background: linear-gradient(to bottom right, var(--color-card-bg), var(--color-bg));
+}
+.job-card.focused,
+.job-card:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #e6f0ff;
 }
 
 @keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .job-header {
@@ -150,6 +162,7 @@
   margin: 0;
   font-weight: 600;
 }
+
 .job-type {
   padding: 2px 6px;
   border-radius: var(--radius-tag);
@@ -157,35 +170,20 @@
   font-weight: 500;
   text-transform: uppercase;
 }
-.job-type.intern {
-  background-color: #d0ebff;
-  color: #1c7ed6;
-}
-.job-type.full-time {
-  background-color: #d3f9d8;
-  color: #2b8a3e;
-}
+.job-type.intern { background-color: #dbeafe; color: #1e3a8a; }
+.job-type.full-time { background-color: #dcfce7; color: #166534; }
 
-.skeleton-card {
-  background-color: var(--color-tag-bg);
-  border-radius: var(--radius-card);
-  height: 120px;
-  margin-bottom: 1rem;
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.job-location, .job-company, .job-salary {
+.job-location,
+.job-company,
+.job-salary {
   font-size: 0.85rem;
   color: var(--color-text-secondary);
 }
+
 .job-tags {
   display: flex;
-  gap: 4px;
   flex-wrap: wrap;
+  gap: 6px;
 }
 .job-tag {
   background-color: var(--color-tag-bg);
@@ -201,30 +199,14 @@
   color: #fff;
 }
 
-.reset-filters-btn {
-  padding: 0.5rem 1rem;
+.skeleton-card {
+  background-color: var(--color-tag-bg);
   border-radius: var(--radius-card);
-  border: 1px solid #d1d5db;
-  background-color: var(--color-card-bg);
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  height: 120px;
+  margin-bottom: 1rem;
+  animation: pulse 1.5s infinite;
 }
-.reset-filters-btn:hover {
-  background-color: var(--color-primary);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px var(--card-shadow);
-}
-
-.job-card.focused,
-.job-card:focus {
-  outline: none;
-  border-color: #007bff;
-  background-color: #e6f0ff;
-}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
 .loader {
   border: 5px solid var(--color-tag-bg);
@@ -235,25 +217,27 @@
   margin: 2rem auto;
   animation: spin 1s linear infinite;
 }
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes spin { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
+.pagination-btn {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background-color: var(--color-card-bg);
+}
+.pagination-btn.active { background-color: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.pagination-btn:disabled { background-color: #f3f3f3; color: #aaa; cursor: not-allowed; }
 
 @media (max-width: 768px) {
-  .job-filters {
-    flex-direction: row;
-    gap: 8px;
-  }
-  .job-filters input,
-  .job-filters select {
-    flex: 1 1 auto;
-    min-width: 90px;
-  }
-  .job-filters button {
-    flex: 0 0 auto;
-  }
-  .job-list-title { font-size: 1.6rem; }
+  .job-filters { gap: 8px; }
+  .job-filters input, .job-filters select { flex: 1 1 auto; min-width: 90px; }
 }
 @media (max-width: 480px) {
   .job-list-container { padding: 1rem; }
