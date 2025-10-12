@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+ **Job Board SPA**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Job Board SPA — одностраничное приложение (SPA) для управления вакансиями, разработанное с использованием **React**, **TypeScript**, **Vite** и **React Router**. Приложение позволяет просматривать, создавать, редактировать и удалять вакансии, а также фильтровать и сортировать их по различным критериям.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Технологии
 
-## React Compiler
+- **Frontend:** React, TypeScript, Vite, React Router  
+- **State Management:** Zustand (локальный state)  
+- **Формы и валидация:** React Hook Form + Zod  
+- **UI/UX:** Модульные CSS, адаптивная вёрстка, тёмная тема, toast-уведомления  
+- **Тестирование:** Vitest + React Testing Library  
+- **Инструменты:** ESLint + Prettier, строгая типизация TypeScript  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+##  Установка и запуск
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Клонировать репозиторий
+```bash
+git clone https://github.com/USERNAME/job-board.git
+cd job-board
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Установить зависимости
+```bash
+npm install
+или
+yarn
 ```
+### 3. Запуск приложения в режиме разработки
+```bash
+npm run dev
+или
+yarn dev
+```
+Приложение будет доступно по адресу: http://localhost:5173
+
+Мок-API
+Приложение использует локальное хранилище (localStorage) для хранения данных. Дополнительный сервер запускать не требуется.
+
+Тестирование
+```bash
+npm run test
+или
+yarn test
+```
+Включает unit-тесты для хуков и компонентов, покрывающие основную логику CRUD и фильтрации.
+
+##  Реализованный функционал
+
+### Основные возможности (MVP)
+- **Список вакансий с карточками**  
+- **Поиск** по названию или компании  
+- **Фильтры**: тип вакансии, локация, теги  
+- **Сортировка** по дате и диапазону зарплаты  
+- **Детальная страница вакансии** (`/jobs/:id`)  
+- **Создание, редактирование и удаление вакансий**  
+  - Полная валидация формы  
+  - Дружелюбные подсказки и ошибки  
+  - Disabled-кнопка при некорректной форме  
+  - Toast-уведомления вместо `alert`  
+
+### Дополнительно
+- Состояние фильтров сохраняется в URL  
+- Псевдо-задержка загрузки (300–800 мс) с обработкой состояний: `loading`, `empty`, `error`  
+- Устойчивость к перезагрузке страницы (данные сохраняются в `localStorage`)  
+
+### Нефункциональные требования
+- Строгая типизация TypeScript  
+- ESLint + Prettier для единообразного кода  
+- Адаптивная и семантичная верстка  
+- UX: отображение состояний загрузки, плавный поиск с debounce, информативные подсказки и сообщения об ошибках 
+
+### Stretch-функционал
+- Реализована пагинация списка
+- Темная тема с сохранением выбора  
+- Оптимистичные обновления списка при CRUD  
+- Toast-уведомления для действий пользователя  
+
+###  Известные ограничения
+- Нет функций экспорта/импорта JSON 
+- i18n был реализован частично (только интерфейсные тексты на русском)  
+
+
+Основные команды
+
+| Команда           | Описание                                         |
+|-------------------|--------------------------------------------------|
+| `npm run dev`     | Запуск приложения в режиме разработки            |
+| `npm run build`   | Production сборка                                |
+| `npm run preview` | Локальный просмотр production сборки             |
+| `npm run test`    | Прогон всех тестов                               |
+| `npm run lint`    | Проверка кода линтером (ESLint)                  |
+
