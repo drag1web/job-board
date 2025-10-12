@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useJobsStore } from "../../../store/useJobsStore";
 import { Job } from "@features/jobs/jobs.model";
 import "./JobDetails.css";
+import toast from "react-hot-toast";
 
 export default function JobDetails() {
   const { id } = useParams<{ id: string }>();
@@ -38,22 +39,25 @@ export default function JobDetails() {
 
   const handleDelete = async () => {
     if (!id || deleting) return;
-    if (!confirm("Вы уверены, что хотите удалить эту вакансию?")) return;
+
+    const confirmed = window.confirm("Вы уверены, что хотите удалить эту вакансию?");
+    if (!confirmed) return;
 
     setDeleting(true);
     try {
       await deleteJob(id);
+      toast.success("Вакансия удалена!");
       navigate("/");
     } catch (err) {
       console.error(err);
+      toast.error("Ошибка при удалении вакансии");
       setDeleting(false);
-      alert("Ошибка при удалении вакансии");
     }
   };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Ссылка на вакансию скопирована!");
+    toast.success("Ссылка на вакансию скопирована!");
   };
 
   if (loading || jobsLoading) return <div className="job-details-loading">Загрузка вакансии...</div>;

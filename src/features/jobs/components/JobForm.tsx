@@ -8,18 +8,19 @@ import { Job } from "@features/jobs/jobs.model";
 import "./JobForm.css";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import toast from "react-hot-toast";
 
 const JobFormSchema = z.object({
-  title: z.string().min(1),
-  company: z.string().min(1),
-  location: z.string().min(1),
+  title: z.string().min(3, { message: "Заголовок слишком короткий (мин. 3 символа)" }),
+  company: z.string().min(2, { message: "Введите название компании" }),
+  location: z.string().min(2, { message: "Введите локацию" }),
   type: z.enum(["intern", "full-time"]),
-  postedAt: z.string().min(1),
-  salaryFrom: z.number().min(0),
-  salaryTo: z.number().min(0),
-  currency: z.string().min(1),
+  postedAt: z.string().min(1, { message: "Укажите дату публикации" }),
+  salaryFrom: z.number().min(0, { message: "Зарплата не может быть отрицательной" }),
+  salaryTo: z.number().min(0, { message: "Зарплата не может быть отрицательной" }),
+  currency: z.string().min(1, { message: "Введите валюту" }),
   tags: z.string().optional(),
-  description: z.string().min(1),
+  description: z.string().min(10, { message: "Описание должно быть не менее 10 символов" }),
 });
 
 type JobFormValues = z.infer<typeof JobFormSchema>;
@@ -61,7 +62,6 @@ export default function JobForm() {
         },
   });
 
-  // Escape → главная
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") navigate("/");
@@ -82,21 +82,27 @@ export default function JobForm() {
   }, [jobToEdit, reset]);
 
   const onSubmit: SubmitHandler<JobFormValues> = async (data) => {
-    const jobData: Job = {
-      ...data,
-      id: jobToEdit?.id || uuidv4(),
-      tags: data.tags?.split(",").map((t) => t.trim()).filter(Boolean) || [],
-      postedAt: jobToEdit ? data.postedAt : new Date().toISOString(),
-    };
+    try {
+      const jobData: Job = {
+        ...data,
+        id: jobToEdit?.id || uuidv4(),
+        tags: data.tags?.split(",").map((t) => t.trim()).filter(Boolean) || [],
+        postedAt: jobToEdit ? data.postedAt : new Date().toISOString(),
+      };
 
-    if (jobToEdit) {
-      await updateJob(jobData);
-    } else {
-      await addJob(jobData);
+      if (jobToEdit) {
+        await updateJob(jobData);
+        toast.success("Вакансия обновлена!");
+      } else {
+        await addJob(jobData);
+        toast.success("Вакансия создана!");
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("Произошла ошибка при сохранении вакансии.");
     }
-
-    navigate("/");
-    alert("Вакансия сохранена!");
   };
 
   const typeValue = watch("type");
@@ -109,6 +115,7 @@ export default function JobForm() {
       <h1 className="job-form-title mb-6">
         {jobToEdit ? "Редактировать вакансию" : "Создать вакансию"}
       </h1>
+
       <form onSubmit={handleSubmit(onSubmit)} className="job-form">
         <div className="job-form-back mb-4">
           <button
@@ -122,25 +129,37 @@ export default function JobForm() {
 
         <div className="job-form-field">
           <label className="job-form-label">Заголовок</label>
-          <input {...register("title")} className="job-form-input" />
+          <input
+            {...register("title")}
+            className={`job-form-input ${errors.title ? "input-error" : ""}`}
+          />
           {errors.title && <p className="job-form-error">{errors.title.message}</p>}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Компания</label>
-          <input {...register("company")} className="job-form-input" />
+          <input
+            {...register("company")}
+            className={`job-form-input ${errors.company ? "input-error" : ""}`}
+          />
           {errors.company && <p className="job-form-error">{errors.company.message}</p>}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Локация</label>
-          <input {...register("location")} className="job-form-input" />
+          <input
+            {...register("location")}
+            className={`job-form-input ${errors.location ? "input-error" : ""}`}
+          />
           {errors.location && <p className="job-form-error">{errors.location.message}</p>}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Тип вакансии</label>
-          <select {...register("type")} className="job-form-input">
+          <select
+            {...register("type")}
+            className={`job-form-input ${errors.type ? "input-error" : ""}`}
+          >
             <option value="intern">Intern</option>
             <option value="full-time">Full-time</option>
           </select>
@@ -156,25 +175,31 @@ export default function JobForm() {
             <input
               type="number"
               {...register("salaryFrom", { valueAsNumber: true })}
-              className="job-form-input"
+              className={`job-form-input ${errors.salaryFrom ? "input-error" : ""}`}
             />
+            {errors.salaryFrom && <p className="job-form-error">{errors.salaryFrom.message}</p>}
           </div>
           <div className="job-form-field">
             <label className="job-form-label">Зарплата до</label>
             <input
               type="number"
               {...register("salaryTo", { valueAsNumber: true })}
-              className="job-form-input"
+              className={`job-form-input ${errors.salaryTo ? "input-error" : ""}`}
             />
+            {errors.salaryTo && <p className="job-form-error">{errors.salaryTo.message}</p>}
           </div>
         </div>
+
         <div className="salary-preview">
           Диапазон: {salaryFrom} – {salaryTo} {currency}
         </div>
 
         <div className="job-form-field">
           <label className="job-form-label">Валюта</label>
-          <input {...register("currency")} className="job-form-input" />
+          <input
+            {...register("currency")}
+            className={`job-form-input ${errors.currency ? "input-error" : ""}`}
+          />
           {errors.currency && <p className="job-form-error">{errors.currency.message}</p>}
         </div>
 
@@ -192,9 +217,7 @@ export default function JobForm() {
                 .map((tag) => tag.trim())
                 .filter(Boolean)
                 .map((tag) => (
-                  <span key={tag} className="job-tag">
-                    {tag}
-                  </span>
+                  <span key={tag} className="job-tag">{tag}</span>
                 ))}
             </div>
           )}
@@ -214,7 +237,7 @@ export default function JobForm() {
           <label className="job-form-label">Описание</label>
           <textarea
             {...register("description")}
-            className="job-form-textarea"
+            className={`job-form-textarea ${errors.description ? "input-error" : ""}`}
             rows={5}
           />
           {errors.description && <p className="job-form-error">{errors.description.message}</p>}
